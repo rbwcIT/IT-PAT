@@ -347,6 +347,13 @@ object Form1: TForm1
     Height = 13
     Caption = 'lbl1'
   end
+  object lbl2: TLabel
+    Left = 32
+    Top = 144
+    Width = 16
+    Height = 13
+    Caption = 'lbl2'
+  end
   object srvrsckt1: TServerSocket
     Active = False
     Port = 2015

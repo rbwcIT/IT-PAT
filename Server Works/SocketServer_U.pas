@@ -13,6 +13,7 @@ type
     imgClient: TImage;
     tmr1: TTimer;
     lbl1: TLabel;
+    lbl2: TLabel;
     procedure srvrsckt1ClientRead(Sender: TObject;
       Socket: TCustomWinSocket);
     procedure FormShow(Sender: TObject);
@@ -20,12 +21,8 @@ type
     procedure srvrsckt1ClientConnect(Sender: TObject;
       Socket: TCustomWinSocket);
   private
-  sText : string;
     { Private declarations }
   public
-    Name : string ;
-    imgdClient : Integer ;
-     ClientReadText : string;
     { Public declarations }
   end;
 
@@ -38,17 +35,26 @@ implementation
 
 procedure TForm1.srvrsckt1ClientRead(Sender: TObject;
   Socket: TCustomWinSocket);
-
+var
+  ClientReadText, sPosition : string;
 begin
-   ClientReadText := Socket.ReceiveText;
-      lbl1.Caption := Socket.ReceiveText;
- //if ClientReadText[1] = '^' then
-// begin
-  // imgClient.top := StrToInt(Copy(ClientReadText,2,Length(ClientReadText)-1));
- //end;
-  imgClient.top := StrToInt(Socket.ReceiveText);
- end;
+  ClientReadText := Socket.ReceiveText;
+  lbl1.Caption := ClientReadText; //  <-- debugging
 
+  //sPosition := Copy(ClientReadText, 2, Length(ClientReadText)-1); \\
+  sPosition := Copy(ClientReadText, 2, 4);                          //   altwee die werk...die lyn sin sny af wanne dit by 10000 kom ma dis nie realisties nie so ons kan altwee gebruik
+
+  lbl2.Caption := sPosition; // <-- debugging
+
+  // onner doen presies dieselfde as dai lang case.. hierie ene lees net moeiliker :)
+
+  if ((ClientReadText[1] = 'U') or (ClientReadText[1] = 'D')) then   // die kyk of dit n op en af change is en veranner in die op en af axis
+  begin
+    imgClient.Top := StrToInt(sPosition);
+  end                                     
+  else    // as dit nie op en af is nie is dit obviousely links of regs en veranner in die horisontal axis                                                   
+    imgClient.Left := StrToInt(sPosition);
+end; // omdat die client die exact position send hoef jy nie te specify in watte rigting hy move nie nie.. sal self regkom...ons kan dit later veranner as dit nodig is
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
