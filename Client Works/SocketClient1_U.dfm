@@ -1,8 +1,8 @@
 object Form1: TForm1
-  Left = 152
-  Top = 191
-  Width = 930
-  Height = 540
+  Left = 226
+  Top = 210
+  Width = 937
+  Height = 542
   Caption = '='
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,7 @@ object Form1: TForm1
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object imgServer: TImage
+  object imgClient2: TImage
     Left = 240
     Top = 128
     Width = 65
@@ -256,7 +256,7 @@ object Form1: TForm1
       2BCEFB3C69E66CF364DBBB3B7CC7C6371C9CCD858F40A28A2A46145145007FFF
       D9}
   end
-  object imgClient: TImage
+  object imgClient1: TImage
     Left = 552
     Top = 136
     Width = 41
@@ -348,17 +348,19 @@ object Form1: TForm1
     Height = 13
     Caption = 'lbl1'
   end
+  object lbl2: TLabel
+    Left = 376
+    Top = 24
+    Width = 16
+    Height = 13
+    Caption = 'lbl2'
+  end
   object clntsckt1: TClientSocket
     Active = False
     ClientType = ctNonBlocking
     Port = 0
     OnConnect = clntsckt1Connect
+    OnRead = clntsckt1Read
     Left = 8
-  end
-  object tmr1: TTimer
-    Interval = 10
-    OnTimer = tmr1Timer
-    Left = 160
-    Top = 56
   end
 end
