@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ScktComp, StdCtrls, ExtCtrls, jpeg, DB, ADODB;
+  Dialogs, ScktComp, StdCtrls, ExtCtrls, jpeg, DB, ADODB, Math;
 
 type
   TForm1 = class(TForm)
@@ -23,6 +23,7 @@ type
 
 var
   Form1: TForm1;
+  Coordinates : array[0..1] of string;
 
 implementation
 
@@ -51,8 +52,16 @@ begin // clientreadtext: <connection number> # <direction(char)> <position>
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
+var
+  a : Integer;
 begin
- srvrsckt1.Active := True ;
+  srvrsckt1.Active := True ;
+
+  for a := 0 to 1 do
+  begin
+    Coordinates[a] := IntToStr(RandomRange(0, 750)) + '|' + IntToStr(RandomRange(0, 750));
+  end;
+
 end;
 
 procedure TForm1.srvrsckt1ClientConnect(Sender: TObject;
@@ -62,7 +71,7 @@ var
 begin
   con_num := srvrsckt1.Socket.ActiveConnections-1; // assign n ID an m nuwe connection
 
-  srvrsckt1.Socket.Connections[con_num].SendText('!' + IntToStr(con_num)); // send dit v die client om te hou
+  srvrsckt1.Socket.Connections[con_num].SendText('!' + IntToStr(con_num) + '@' + Coordinates[0] + '-' + Coordinates[1]); // send dit v die client om te hou
 end;
 
 end.

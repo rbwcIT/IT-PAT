@@ -27,12 +27,14 @@ type
 var
   Form1: TForm1;
 
+  Coordinates : array[0..1] of string;
+
   MY_CONNECTION_NUMBER : String;  // kry van server (dynamically assign)
 
 const
   MOVEMENT_SPACE : Integer = 10;
-  SERVER_IP : string = '127.0.0.1';     // by huis en basic testing
-  //SERVER_IP : string = '192.168.0.1'; // by skool en network testing
+  //SERVER_IP : string = '127.0.0.1';     // by huis en basic testing
+  SERVER_IP : string = '192.168.0.101'; // by skool en network testing
   CONNECTION_PORT : Integer = 2015;     // makliker as ons later wil verander
 
 implementation
@@ -101,16 +103,28 @@ end;
 procedure TForm1.clntsckt1Read(Sender: TObject; Socket: TCustomWinSocket);
 var
   sText, moving_connection : string;  // sText: <connection_num>#<instructions>
+  sprite : TImage;
+  a : Integer;
 begin
   sText := Socket.ReceiveText;
 
   if sText[1] = '!' then    //  message van server wat ID gee
   begin
     Delete(sText, 1, 1);
-    MY_CONNECTION_NUMBER := sText;
+    MY_CONNECTION_NUMBER := sText[1];
+    Delete(sText, 1, 2);
+
+    Coordinates[0] := Copy(sText, 1, Pos('-', Coordinates[0])-1);
+    Coordinates[1] := sText;
+
+    imgClient1.Left := StrToInt(Copy(Coordinates[0], 1, Pos('|', Coordinates[0])-1));
+    imgClient1.Top := StrToInt(Copy(Coordinates[0], Pos('|', Coordinates[0])+1, Length(Coordinates[0])));
+    imgClient2.Left := StrToInt(Copy(Coordinates[1], 1, Pos('|', Coordinates[1])-1));
+    imgClient2.Top := StrToInt(Copy(Coordinates[1], Pos('|', Coordinates[1])+1, Length(Coordinates[1])));
+
     Exit;
   end;
-  
+
 //  ons gan later n dynamic array gebruik om al die connectons te log en die images daaran te koppel
   moving_connection := Copy(sText, 1, Pos('#', sText)-1);
   Delete(sText, 1, Pos('#', sText));
