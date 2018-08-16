@@ -18,9 +18,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure clntsckt1Connect(Sender: TObject; Socket: TCustomWinSocket);
     procedure clntsckt1Read(Sender: TObject; Socket: TCustomWinSocket);
-    procedure MoveSprite(Sprite : TImage; instructions : string);        //eie function (move image)
-    function BuildInstruction(Sprite : TImage; cDirection : char) : string;   //eie function (bou die string wat gesend gan word oor netword)
-  private
+    procedure MoveSprite(Sprite : TImage; instructions : char);        //eie function (move image)
     { Private declarations }
   public
     { Public declarations }
@@ -44,27 +42,45 @@ implementation
 procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var
-  sMovement : string;   // format: <direction> <position>
+  sMovement : string;   // format: <con_num> # <direction>
   Direction : Char;
+  sprite : TImage;
 begin
-  case key of
-  VK_UP:
-    Direction := 'U';
-
-  VK_DOWN:
-    Direction := 'D';       // kort dit as deel van movement string
-
-  VK_LEFT:
-    Direction := 'L';
-
-  VK_RIGHT:
-    Direction := 'R';
+  if MY_CONNECTION_NUMBER = '0' then                // kyk net watte image is wie sin mar ons gan later dynamic array werk
+  begin
+    sMovement := '0#';
+    sprite := imgClient1;
+  end
+  else
+  begin
+    sMovement := '1#';
+    sprite := imgClient2;
   end;
 
-  if MY_CONNECTION_NUMBER = '0' then                // kyk net watte image is wie sin mar ons gan later dynamic array werk
-    sMovement := BuildInstruction(imgClient1, Direction)
-  else
-    sMovement := BuildInstruction(imgClient2, Direction);
+  case key of
+  VK_UP:
+    begin
+      Direction := 'U';
+    end;
+
+  VK_DOWN:
+    begin
+      Direction := 'D';
+    end;       // kort dit as deel van movement string
+
+  VK_LEFT:
+    begin
+      Direction := 'L';
+    end;
+
+  VK_RIGHT:
+    begin
+      Direction := 'R';
+    end;
+  end;
+
+  MoveSprite(sprite, Direction);
+  sMovement := sMovement + Direction;
 
   clntsckt1.Socket.SendText(sMovement);
 end;
@@ -100,58 +116,23 @@ begin
   Delete(sText, 1, Pos('#', sText));
 
   if moving_connection = '0' then  // temporary image assignment
-    MoveSprite(imgClient1, sText)
+    MoveSprite(imgClient1, sText[1])
   else
-    MoveSprite(imgClient2, sText);    
+    MoveSprite(imgClient2, sText[1]);
 end;
 
-procedure TForm1.MoveSprite(Sprite: TImage; instructions: string);   // skuif image wat jy se na sekere plek toe
-var
-  sDirection : string;
+procedure TForm1.MoveSprite(Sprite: TImage; instructions: char);   // skuif image wat jy se na sekere plek toe
 begin
-  sDirection := instructions[1];
-  Delete(instructions, 1, 1);
-
-  if ((sDirection='U') or (sDirection='D')) then
-    Sprite.Top := StrToInt(instructions)
-  else
-    Sprite.Left := StrToInt(instructions);
-end;
-
-function TForm1.BuildInstruction(Sprite: TImage;  //  format: <connection_number>  # <direction(char)> <position>
-  cDirection: char): string;
-var
-  position : Integer;
-begin
-  Result := MY_CONNECTION_NUMBER + '#' + cDirection;
-
-  case cDirection of
+  case instructions of
   'U':
-    begin
-      Sprite.Top := Sprite.Top - MOVEMENT_SPACE;
-      position := Sprite.Top;
-    end;
+      sprite.Top := sprite.Top - MOVEMENT_SPACE; 
   'D':
-    begin                                                  // skuif image en record position na geskuif is
-      Sprite.Top := Sprite.Top + MOVEMENT_SPACE;
-      position := Sprite.Top;
-    end;
+      sprite.Top := sprite.Top + MOVEMENT_SPACE;
   'L':
-    begin
-      Sprite.Left := Sprite.Left - MOVEMENT_SPACE;
-      position := Sprite.Left;
-    end;
+      sprite.Left := sprite.Left - MOVEMENT_SPACE;
   'R':
-    begin
-      Sprite.Left := Sprite.Left + MOVEMENT_SPACE;
-      position := Sprite.Left;
-    end;
+      sprite.Left := sprite.Left + MOVEMENT_SPACE;
   end;
-
-  Result := Result + IntToStr(position);
-  lbl2.Caption:= Result;   // <-- debugging
-  
-
 end;
 
 end.
